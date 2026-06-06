@@ -1,0 +1,2 @@
+# Keep JSON snapshots consistent across Windows and Linux CI.
+*.json text eol=lf

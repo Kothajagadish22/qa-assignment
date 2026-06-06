@@ -10,6 +10,8 @@ jobs:
     name: pytest (UI + API)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      CI: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,11 +30,19 @@ jobs:
       - name: Install Playwright browsers
         run: python -m playwright install --with-deps chromium
 
-      - name: Run tests
-        run: pytest -n auto --html=report.html --self-contained-html
+      - name: Run API tests
+        run: pytest assignment2-api -v --tb=short -o addopts=
+
+      - name: Run UI tests
+        run: pytest assignment1-ui -v --tb=short -o addopts=
 
       - name: Upload HTML report
-        if: ${{ !cancelled() }}
+        if: always()
+        run: pytest --html=report.html --self-contained-html -q -o addopts=
+        continue-on-error: true
+
+      - name: Upload report artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pytest-report

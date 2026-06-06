@@ -11,6 +11,15 @@ from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 
 
+@pytest.fixture(scope="session")
+def browser_type_launch_args(browser_type_launch_args):
+    """Chromium on Linux CI runners needs --no-sandbox to launch."""
+    args = list(browser_type_launch_args.get("args", []))
+    if os.getenv("CI"):
+        args.extend(["--no-sandbox", "--disable-setuid-sandbox"])
+    return {**browser_type_launch_args, "args": args}
+
+
 @pytest.fixture
 def login_page(page):
     return LoginPage(page)

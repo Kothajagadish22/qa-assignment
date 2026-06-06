@@ -40,9 +40,9 @@ def assert_matches_snapshot(name: str, shape) -> None:
             fh.write(actual)
         return
 
-    with open(path, "r", encoding="utf-8") as fh:
-        expected = fh.read()
-    assert actual == expected, (
+    with open(path, "r", encoding="utf-8", newline="") as fh:
+        expected = fh.read().replace("\r\n", "\n").strip()
+    assert actual.strip() == expected, (
         f"Contract drift for '{name}'.\nExpected:\n{expected}\nActual:\n{actual}"
     )
 

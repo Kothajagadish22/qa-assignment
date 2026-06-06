@@ -13,7 +13,13 @@ def test_get_nonexistent_cart(api):
     res = api.get("/carts/999999")
     # A strict API would return 404; the mock returns 200 with null/empty body.
     raw = res.text.strip()
-    parsed = res.json() if raw else None
+    if not raw:
+        parsed = None
+    else:
+        try:
+            parsed = res.json()
+        except ValueError:
+            parsed = raw
     assert parsed in (None, "", {}) or (isinstance(parsed, dict) and not parsed)
 
 
