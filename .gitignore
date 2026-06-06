@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+report.html
+assets/
+test-results/
+.playwright/
+*.log
+.env
+.DS_Store
+~$*.xlsx
+~$*.xls
