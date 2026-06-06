@@ -7,6 +7,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 import pytest
 import requests
 
+from mock_responses import register_mocks
+
 BASE_URL = "https://fakestoreapi.com"
 
 
@@ -55,6 +57,17 @@ class ApiClient:
 
 @pytest.fixture(scope="session")
 def api():
-    client = ApiClient()
-    yield client
-    client.session.close()
+    """Use mocked API responses in CI (GitHub runners often cannot reach fakestoreapi.com)."""
+    use_mocks = os.getenv("CI", "").lower() == "true" or os.getenv("USE_API_MOCKS") == "1"
+    if use_mocks:
+        mock = register_mocks()
+        mock.start()
+        client = ApiClient()
+        yield client
+        client.session.close()
+        mock.stop()
+        mock.reset()
+    else:
+        client = ApiClient()
+        yield client
+        client.session.close()

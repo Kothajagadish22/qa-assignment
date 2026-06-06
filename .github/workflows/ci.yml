@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 30
     env:
       CI: true
+      USE_API_MOCKS: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
