@@ -10,11 +10,11 @@ from schemas import AUTH_TOKEN_SCHEMA
 @pytest.mark.positive
 def test_valid_credentials_return_token(api):
     res = api.post("/auth/login", json=AUTH["valid"])
-    assert res.status_code in (200, 201)
+    assert res.status_code in (200, 201), res.text
 
     body = res.json()
     validate(instance=body, schema=AUTH_TOKEN_SCHEMA)
-    assert len(body["token"]) > 0
+    assert body.get("token")
 
 
 @pytest.mark.api
@@ -22,9 +22,12 @@ def test_valid_credentials_return_token(api):
 @pytest.mark.negative
 def test_invalid_credentials_no_valid_token(api):
     res = api.post("/auth/login", json=AUTH["invalid"])
-    raw = res.text
-    looks_like_jwt = "token" in raw and raw.count(".") >= 2
-    assert not looks_like_jwt
+    assert res.status_code in (400, 401, 403), res.text
+    try:
+        body = res.json()
+    except ValueError:
+        return
+    assert "token" not in body or not body.get("token")
 
 
 @pytest.mark.api

@@ -19,7 +19,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
           cache: pip
 
       - name: Install dependencies
@@ -31,20 +31,21 @@ jobs:
         run: python -m playwright install --with-deps chromium
 
       - name: Run API tests
-        run: pytest assignment2-api -v --tb=short -o addopts=
+        run: python -m pytest assignment2-api -c pytest-ci.ini --junitxml=api-results.xml
+        env:
+          PYTHONPATH: assignment2-api
 
       - name: Run UI tests
-        run: pytest assignment1-ui -v --tb=short -o addopts=
+        run: python -m pytest assignment1-ui -c pytest-ci.ini --junitxml=ui-results.xml
+        env:
+          PYTHONPATH: assignment1-ui
 
-      - name: Upload HTML report
-        if: always()
-        run: pytest --html=report.html --self-contained-html -q -o addopts=
-        continue-on-error: true
-
-      - name: Upload report artifact
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-report
-          path: report.html
+          name: test-results
+          path: |
+            api-results.xml
+            ui-results.xml
           retention-days: 14
